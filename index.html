@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bulk UPC Label Generator - Large Font</title>
+  <title>Bulk UPC Label Generator - Custom Styles</title>
   <style>
     /* --- RESET --- */
     * { 
@@ -39,7 +39,6 @@
       font-size: 14px;
     }
     
-    /* INCREASED HEIGHT FOR TEXT AREA */
     textarea {
       min-height: 250px; /* Taller input box */
       font-family: monospace;
@@ -93,12 +92,22 @@
 
     .label-container:first-child { margin-top: 0; }
 
-    /* --- UNIFIED LARGE FONT STYLING --- */
-    /* All text lines use the same large size and weight */
-    .txt-unified { 
-      font-size: 22pt; /* Same large size for all lines */
+    /* --- FONT STYLES --- */
+    
+    /* Line 1: Large & Extra Bold */
+    .txt-primary { 
+      font-size: 22pt; 
       font-weight: 900; /* Extra Bold */
       text-transform: uppercase; 
+      margin: 2px 0;
+      line-height: 1.2;
+      color: #000;
+    }
+
+    /* Line 2, 3, UPC, Qty: Same Size, Reduced Bold */
+    .txt-secondary { 
+      font-size: 22pt; /* Same size as Line 1 */
+      font-weight: 500; /* Medium weight (Reduced Bold) */
       margin: 2px 0;
       line-height: 1.2;
       color: #000;
@@ -142,7 +151,7 @@
 
   <div class="input-panel">
     <h1>Bulk UPC Label Generator</h1>
-    <p>All lines will appear in <b>Large Bold Text</b>. 3 labels per A4 page.</p>
+    <p>Line 1 is Extra Bold. Other lines are large but lighter.</p>
 
     <div class="form-group">
       <label>Line 1 (Name)</label>
@@ -204,14 +213,14 @@
 
           if (item) {
             const bcId = `bc-${i}-${j}`;
-            // All lines use the same .txt-unified class for same size/boldness
+            // Applied specific classes based on user request
             labelDiv.innerHTML = `
-              <div class="txt-unified">${line1}</div>
-              <div class="txt-unified">${line2}</div>
-              <div class="txt-unified">${line3}</div>
+              <div class="txt-primary">${line1}</div>
+              <div class="txt-secondary">${line2}</div>
+              <div class="txt-secondary">${line3}</div>
               <svg id="${bcId}" class="barcode-svg"></svg>
-              <div class="txt-unified">UPC - ${item.upc}</div>
-              <div class="txt-unified">Quantity - ${item.qty}</div>
+              <div class="txt-secondary">UPC - ${item.upc}</div>
+              <div class="txt-secondary">Quantity - ${item.qty}</div>
             `;
             
             page.appendChild(labelDiv);
