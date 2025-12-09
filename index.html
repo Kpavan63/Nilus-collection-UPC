@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bulk UPC Label Generator (Per‑UPC Qty)</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app { width: 100%; max-width: 960px; }
+    .header { margin-bottom: 16px; }
+    .header h1 { margin: 0 0 4px; font-size: 22px; font-weight: 700; }
+    .header p { margin: 0; font-size: 13px; color: #6b7280; }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 16px 18px 14px;
+      box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+      margin-bottom: 14px;
+    }
+
+    .panel-step { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 2px; }
+    .panel-title { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
+
+    .fields-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    .field { flex: 1 1 240px; min-width: 0; }
+    .field label { font-size: 12px; font-weight: 600; display: block; margin-bottom: 3px; color: #374151; }
+    .field small { font-size: 11px; color: #9ca3af; }
+
+    input[type="text"], textarea {
+      width: 100%; padding: 7px 9px; border-radius: 7px;
+      border: 1px solid #d1d5db; font-size: 14px; font-family: inherit;
+      background: #f9fafb; outline: none;
+      transition: border-color .15s, box-shadow .15s, background-color .15s;
+    }
+    input:focus, textarea:focus {
+      border-color: #2563eb; box-shadow: 0 0 0 1px rgba(37,99,235,.35); background: #ffffff;
+    }
+    textarea { resize: vertical; min-height: 150px; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+    .btn {
+      border-radius: 999px; border: none; padding: 9px 18px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .btn-primary { background: #2563eb; color: #ffffff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #ffffff; color: #111827; border: 1px solid #d1d5db; }
+    .btn-secondary:hover { background: #f3f4f6; }
+
+    .hint { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+    #pagesContainer { margin-top: 10px; }
+    .preview-title { font-size: 13px; color: #6b7280; margin: 0 0 4px; }
+
+    .page {
+      width: 210mm; min-height: 297mm; margin: 10px auto 16px;
+      background: #ffffff; box-shadow: 0 0 5px rgba(15,23,42,0.18);
+      padding: 15mm; border-radius: 8px; box-sizing: border-box;
+    }
+
+    .label {
+      height: calc((297mm - 30mm) / 3);
+      border-bottom: 1px dashed #e5e7eb;
+      padding-bottom: 6mm; margin-bottom: 6mm;
+    }
+    .label:last-child { border-bottom: none; }
+
+    .label h1, .label h2, .label h3, .label p { margin: 0; }
+    .label h1 { font-size: 18px; font-weight: 700; }
+    .label h2 { font-size: 16px; font-weight: 700; }
+    .label h3 { font-size: 16px; margin-top: 4px; margin-bottom: 10px; }
+    .barcode-wrapper { margin: 8px 0 6px; }
+    .label p { font-size: 14px; margin-top: 2px; }
+
+    @media print {
+      body { background: #ffffff; padding: 0; display: block; }
+      .header, .panel { display: none; }
+      .page {
+        box-shadow: none; margin: 0; width: 210mm; min-height: 297mm;
+        border-radius: 0; page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>Bulk UPC Label Generator</h1>
+    <p>Each line = one label with its own UPC and Quantity.</p>
+  </div>
+
+  <!-- Fixed text -->
+  <div class="panel">
+    <div class="panel-step">Step 1</div>
+    <h2 class="panel-title">Label text (same for all)</h2>
+
+    <div class="fields-row">
+      <div class="field">
+        <label for="line1">Line 1 (Name)</label>
+        <input id="line1" type="text" value="Nilu’s collection,">
+      </div>
+      <div class="field">
+        <label for="line2">Line 2 (Company)</label>
+        <input id="line2" type="text" value="BLINK COMMERCE PRIVATE LIMITED">
+      </div>
+      <div class="field">
+        <label for="line3">Line 3 (Location)</label>
+        <input id="line3" type="text" value="Hyderabad H3 - Feeder Warehouse">
+      </div>
+    </div>
+  </div>
+
+  <!-- UPC + quantity list -->
+  <div class="panel">
+    <div class="panel-step">Step 2</div>
+    <h2 class="panel-title">UPC and quantity list</h2>
+
+    <div class="field">
+      <label for="upcList">UPC,Quantity (one per line)</label>
+      <textarea id="upcList" placeholder="20110519,31&#10;20110520,12&#10;20110521,5"></textarea>
+      <div class="hint">Format: UPC,Quantity. Example line: <b>20110519,31</b>. If quantity is missing, 1 will be used.</div>
+    </div>
+
+    <div class="actions">
+      <button id="generate" class="btn btn-primary">Generate labels</button>
+      <button type="button" class="btn btn-secondary" onclick="window.print()">Print A4 (3 labels/page)</button>
+    </div>
+  </div>
+
+  <div id="pagesContainer"></div>
+</div>
+
+<!-- JsBarcode library -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script> <!-- [web:60] -->
+
+<script>
+  const generateBtn = document.getElementById('generate');
+  const pagesContainer = document.getElementById('pagesContainer');
+
+  function parseLines(raw) {
+    return raw
+      .split(/
+?
+/)
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .map(line => {
+        const parts = line.split(',');
+        const upc = (parts[0] || '').trim();
+        const qty = (parts[1] || '1').trim();
+        return { upc, qty };
+      })
+      .filter(item => item.upc.length > 0);
+  }
+
+  function generateLabels() {
+    const line1 = document.getElementById('line1').value.trim();
+    const line2 = document.getElementById('line2').value.trim();
+    const line3 = document.getElementById('line3').value.trim();
+    const rawList = document.getElementById('upcList').value;
+
+    const items = parseLines(rawList);
+    pagesContainer.innerHTML = '';
+
+    if (items.length === 0) {
+      alert('Please enter at least one line in the format UPC,Quantity.');
+      return;
+    }
+
+    const info = document.createElement('p');
+    info.className = 'preview-title';
+    info.textContent = `Preview: ${items.length} label(s). Printed on A4, 3 labels per page.`;
+    pagesContainer.appendChild(info);
+
+    let page = null;
+    let labelsOnPage = 0;
+
+    items.forEach(({ upc, qty }) => {
+      if (!page || labelsOnPage === 3) {
+        page = document.createElement('div');
+        page.className = 'page';
+        pagesContainer.appendChild(page);
+        labelsOnPage = 0;
+      }
+
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.innerHTML = `
+        <h1>${line1}</h1>
+        <h2>${line2}</h2>
+        <h3>${line3}</h3>
+        <div class="barcode-wrapper">
+          <svg class="barcode"></svg>
+        </div>
+        <p><strong>UPC - ${upc}</strong></p>
+        <p><strong>Quantity - ${qty}</strong></p>
+      `;
+      page.appendChild(label);
+
+      const svg = label.querySelector('.barcode');
+      JsBarcode(svg, upc, {
+        format: "CODE128",
+        lineColor: "#000000",
+        width: 2,
+        height: 60,
+        displayValue: true
+      });
+
+      labelsOnPage++;
+    });
+  }
+
+  generateBtn.addEventListener('click', generateLabels);
+</script>
+</body>
+</html>
