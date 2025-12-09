@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bulk UPC Label Ai</title>
+  <title>Bulk UPC Label Generator</title>
   <style>
     /* --- RESET --- */
     * { 
@@ -233,8 +233,10 @@
         /* REMOVE PADDING FOR PRINT - FILL ENTIRE PAGE */
         padding: 0 !important;
         
+        /* USE SPACE-BETWEEN TO DISTRIBUTE LABELS: TOP, MIDDLE, BOTTOM */
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
       }
       
       /* Avoid extra blank page at the end */
@@ -244,14 +246,13 @@
 
       .label-container {
         /* Each label takes EXACTLY 1/3 of A4 height (99mm) */
-        flex: 1;
+        flex: 0 0 99mm; /* Fixed height, no grow, no shrink */
         width: 210mm;
         height: 99mm;
         
         border: 3px solid #000;
-        border-top: none;
-        margin-top: 0;
-        padding: 10mm;
+        padding: 8mm;
+        margin: 0;
         
         display: flex;
         flex-direction: column;
@@ -262,8 +263,9 @@
         page-break-inside: avoid;
       }
 
+      /* Remove border merging for print - each label separate */
       .label-container:first-child {
-        border-top: 3px solid #000;
+        border: 3px solid #000;
       }
 
       /* TEXT SIZES FOR PRINT */
