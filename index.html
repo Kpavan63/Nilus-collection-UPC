@@ -36,7 +36,6 @@
       color: #6b7280;
     }
 
-    /* Table-style form */
     .table-card {
       background: #ffffff;
       border-radius: 10px;
@@ -155,7 +154,53 @@
       background: #f3f4f6;
     }
 
-    /* Preview pages */
+    .btn-download {
+      background: #10b981;
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(16,185,129,0.35);
+    }
+    .btn-download:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .btn-download-word {
+      background: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(59,130,246,0.35);
+    }
+    .btn-download-word:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    /* Preview area */
+    #previewArea {
+      display: none;
+    }
+
+    .preview-header {
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.12);
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .preview-header h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .preview-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
     #pagesContainer {
       margin-top: 8px;
     }
@@ -208,7 +253,8 @@
         display: block;
       }
       .header,
-      .table-card {
+      .table-card,
+      .preview-header {
         display: none;
       }
       .page {
@@ -245,16 +291,17 @@
 <div class="app">
   <div class="header">
     <h1>Bulk UPC Label Generator</h1>
-    <p>Use the table below to set label text and paste UPC with quantity. Preview shows 3 labels per A4 page.</p>
+    <p>Create A4 labels with 3 per page. Each line: UPC,Quantity. Download as PDF or Word.</p>
   </div>
 
+  <!-- Input Form -->
   <div class="table-card">
-    <h2 class="table-title">Label configuration</h2>
+    <h2 class="table-title">Label Configuration</h2>
 
     <table class="settings-table">
       <tr>
         <th>Line 1 (Name)</th>
-        <td><input id="line1" type="text" value="Nilu’s collection,"></td>
+        <td><input id="line1" type="text" value="Nilu's collection,"></td>
       </tr>
       <tr>
         <th>Line 2 (Company)</th>
@@ -277,18 +324,37 @@
     </table>
 
     <div class="actions">
-      <button id="generate" class="btn btn-primary">Generate labels</button>
-      <button type="button" class="btn btn-secondary" onclick="window.print()">Print A4 (3 per page)</button>
+      <button id="generate" class="btn btn-primary">Generate Labels</button>
     </div>
   </div>
 
-  <div id="pagesContainer"></div>
+  <!-- Preview Area (Hidden until generate is clicked) -->
+  <div id="previewArea">
+    <div class="preview-header">
+      <h2>Preview Labels</h2>
+      <div class="preview-actions">
+        <button id="downloadPdf" class="btn btn-download">Download PDF</button>
+        <button id="downloadWord" class="btn btn-download-word">Download Word</button>
+        <button type="button" class="btn btn-secondary" onclick="window.print()">Print</button>
+      </div>
+    </div>
+
+    <div id="pagesContainer"></div>
+  </div>
 </div>
 
 <!-- JsBarcode library -->
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script> <!-- [web:60] -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
+<!-- html2pdf library for PDF download -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- docx library for Word download -->
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 
 <script>
+  let generatedLabels = {};
+
   function parseLines(raw) {
     return raw
       .split(/
@@ -320,10 +386,12 @@
       return;
     }
 
+    generatedLabels = { line1, line2, line3, items };
+
     const info = document.createElement('p');
     info.className = 'preview-title';
     info.textContent =
-      'Preview: ' + items.length + ' label(s). Printed on A4 with three labels per page.';
+      'Preview: ' + items.length + ' label(s). A4 with three labels per page.';
     pagesContainer.appendChild(info);
 
     let page = null;
@@ -362,9 +430,99 @@
 
       labelsOnPage++;
     });
+
+    document.getElementById('previewArea').style.display = 'block';
+    window.scrollTo(0, document.querySelector('.preview-header').offsetTop - 100);
+  }
+
+  function downloadPdf() {
+    const element = document.getElementById('pagesContainer');
+    const opt = {
+      margin: 0,
+      filename: 'labels.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().from(element).set(opt).save();
+  }
+
+  function downloadWord() {
+    const { line1, line2, line3, items } = generatedLabels;
+
+    if (!items || items.length === 0) {
+      alert('No labels generated yet.');
+      return;
+    }
+
+    const sections = [];
+    let labelCount = 0;
+
+    items.forEach(({ upc, qty }) => {
+      const paragraphs = [
+        new docx.Paragraph({
+          text: line1,
+          size: 36,
+          bold: true,
+          spacing: { line: 200, before: 100, after: 50 }
+        }),
+        new docx.Paragraph({
+          text: line2,
+          size: 32,
+          bold: true,
+          spacing: { before: 50, after: 50 }
+        }),
+        new docx.Paragraph({
+          text: line3,
+          size: 32,
+          bold: true,
+          spacing: { before: 50, after: 150 }
+        }),
+        new docx.Paragraph({
+          text: 'UPC - ' + upc,
+          size: 28,
+          bold: true,
+          spacing: { before: 50, after: 50 }
+        }),
+        new docx.Paragraph({
+          text: 'Quantity - ' + qty,
+          size: 28,
+          bold: true,
+          spacing: { before: 0, after: 200 }
+        })
+      ];
+
+      sections.push(
+        new docx.Section({
+          children: paragraphs,
+          properties: {
+            pageBreakBefore: labelCount > 0 && labelCount % 3 === 0
+          }
+        })
+      );
+
+      labelCount++;
+    });
+
+    const doc = new docx.Document({
+      sections: sections
+    });
+
+    docx.Packer.toBlob(doc).then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'labels.docx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    });
   }
 
   document.getElementById('generate').addEventListener('click', generateLabels);
+  document.getElementById('downloadPdf').addEventListener('click', downloadPdf);
+  document.getElementById('downloadWord').addEventListener('click', downloadWord);
 </script>
 </body>
 </html>
