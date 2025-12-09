@@ -5,246 +5,239 @@
   <title>Bulk UPC Label Generator</title>
 
   <style>
-    * { box-sizing:border-box; }
+    * { box-sizing: border-box; }
 
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background: radial-gradient(circle at top left,#e0ecff,#f9fafb);
-      color:#111827;
-      padding:32px 20px;
-      display:flex;
-      justify-content:center;
-    }
-
-    .app{
-      width:100%;
-      max-width:1040px;
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      padding: 24px 12px;
+      display: flex;
+      justify-content: center;
     }
 
-    .header{
-      margin-bottom:18px;
-    }
-    .header h1{
-      margin:0 0 4px;
-      font-size:24px;
-      font-weight:700;
-      letter-spacing:0.01em;
-    }
-    .header p{
-      margin:0;
-      font-size:13px;
-      color:#6b7280;
+    .app {
+      width: 100%;
+      max-width: 1100px;
     }
 
-    .panel{
-      background:#ffffff;
-      border-radius:16px;
-      padding:18px 20px 16px;
-      box-shadow:
-        0 16px 40px rgba(15,23,42,0.12),
-        0 0 0 1px rgba(148,163,184,0.25);
-      margin-bottom:16px;
+    .header {
+      margin-bottom: 16px;
+    }
+    .header h1 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .header p {
+      margin: 0;
+      font-size: 13px;
+      color: #6b7280;
     }
 
-    .panel-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:12px;
+    /* Table-style form */
+    .table-card {
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.12);
+      padding: 14px 16px 12px;
+      margin-bottom: 14px;
+      border: 1px solid #e5e7eb;
     }
 
-    .panel-step{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:0.14em;
-      color:#9ca3af;
+    .table-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 8px;
     }
 
-    .panel-title{
-      font-size:15px;
-      font-weight:600;
-      margin:2px 0 0;
+    .settings-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 6px;
     }
 
-    .tag{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:0.12em;
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid #bfdbfe;
-      background:#eff6ff;
-      color:#1d4ed8;
-      font-weight:600;
+    .settings-table th,
+    .settings-table td {
+      padding: 8px 6px;
+      font-size: 13px;
+      text-align: left;
+      vertical-align: top;
     }
 
-    .fields-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:14px;
-      margin-top:6px;
+    .settings-table th {
+      width: 180px;
+      color: #4b5563;
+      font-weight: 600;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
     }
 
-    .field{
-      flex:1 1 240px;
-      min-width:0;
+    .settings-table td {
+      border-bottom: 1px solid #f3f4f6;
     }
 
-    .field label{
-      font-size:12px;
-      font-weight:600;
-      display:block;
-      margin-bottom:4px;
-      color:#374151;
-    }
-
-    .field small{
-      font-size:11px;
-      color:#9ca3af;
+    .settings-table tr:last-child th,
+    .settings-table tr:last-child td {
+      border-bottom: none;
     }
 
     input[type="text"],
-    textarea{
-      width:100%;
-      padding:8px 10px;
-      border-radius:9px;
-      border:1px solid #d1d5db;
-      font-size:14px;
-      font-family:inherit;
-      background:#f9fafb;
-      outline:none;
-      transition:border-color .16s,box-shadow .16s,background-color .16s;
+    textarea {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      font-family: inherit;
+      background: #f9fafb;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s, background-color .15s;
     }
 
     input:focus,
-    textarea:focus{
-      border-color:#2563eb;
-      box-shadow:0 0 0 1px rgba(37,99,235,0.4);
-      background:#ffffff;
+    textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.4);
+      background: #ffffff;
     }
 
-    textarea{
-      resize:vertical;
-      min-height:160px;
+    textarea {
+      min-height: 150px;
+      resize: vertical;
     }
 
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:10px;
-      align-items:center;
+    .hint {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
     }
 
-    .btn{
-      border-radius:999px;
-      border:none;
-      padding:9px 20px;
-      font-size:14px;
-      font-weight:600;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      white-space:nowrap;
-      transition:background-color .16s,box-shadow .16s,transform .08s;
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      align-items: center;
     }
 
-    .btn-primary{
-      background:linear-gradient(135deg,#2563eb,#1d4ed8);
-      color:#ffffff;
-      box-shadow:0 10px 24px rgba(37,99,235,0.35);
-    }
-    .btn-primary:hover{
-      background:linear-gradient(135deg,#1d4ed8,#1e40af);
-      box-shadow:0 14px 28px rgba(37,99,235,0.40);
-      transform:translateY(-1px);
-    }
-
-    .btn-secondary{
-      background:#ffffff;
-      color:#111827;
-      border:1px solid #d1d5db;
-    }
-    .btn-secondary:hover{
-      background:#f3f4f6;
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      transition: background-color .15s, box-shadow .15s, transform .08s;
     }
 
-    .hint{
-      font-size:12px;
-      color:#6b7280;
-      margin-top:3px;
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(37,99,235,0.35);
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
     }
 
-    #pagesContainer{
-      margin-top:8px;
+    .btn-secondary {
+      background: #ffffff;
+      color: #111827;
+      border: 1px solid #d1d5db;
+    }
+    .btn-secondary:hover {
+      background: #f3f4f6;
     }
 
-    .preview-title{
-      font-size:13px;
-      color:#6b7280;
-      margin:0 0 4px;
+    /* Preview pages */
+    #pagesContainer {
+      margin-top: 8px;
     }
 
-    .page{
-      width:210mm;
-      min-height:297mm;
-      margin:10px auto 18px;
-      background:#ffffff;
-      box-shadow:0 6px 18px rgba(15,23,42,0.2);
-      padding:15mm;
-      border-radius:10px;
-      box-sizing:border-box;
+    .preview-title {
+      font-size: 13px;
+      color: #6b7280;
+      margin: 0 0 4px;
     }
 
-    .label{
-      height:calc((297mm - 30mm)/3);
-      border-bottom:1px dashed #e5e7eb;
-      padding-bottom:6mm;
-      margin-bottom:6mm;
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 10px auto 16px;
+      background: #ffffff;
+      box-shadow: 0 6px 18px rgba(15,23,42,0.2);
+      padding: 15mm;
+      border-radius: 8px;
+      box-sizing: border-box;
     }
 
-    .label:last-child{ border-bottom:none; }
+    .label {
+      height: calc((297mm - 30mm)/3);
+      border-bottom: 1px dashed #e5e7eb;
+      padding-bottom: 6mm;
+      margin-bottom: 6mm;
+    }
+    .label:last-child {
+      border-bottom: none;
+    }
 
     .label h1,
     .label h2,
     .label h3,
-    .label p{ margin:0; }
+    .label p {
+      margin: 0;
+    }
 
-    .label h1{ font-size:18px; font-weight:700; }
-    .label h2{ font-size:16px; font-weight:700; }
-    .label h3{ font-size:16px; margin-top:4px; margin-bottom:10px; }
+    .label h1 { font-size: 18px; font-weight: 700; }
+    .label h2 { font-size: 16px; font-weight: 700; }
+    .label h3 { font-size: 16px; margin-top: 4px; margin-bottom: 10px; }
 
-    .barcode-wrapper{ margin:8px 0 6px; }
+    .barcode-wrapper { margin: 8px 0 6px; }
+    .label p { font-size: 14px; margin-top: 2px; }
 
-    .label p{ font-size:14px; margin-top:2px; }
-
-    @media print{
-      body{
-        background:#ffffff;
-        padding:0;
-        display:block;
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+        display: block;
       }
       .header,
-      .panel{
-        display:none;
+      .table-card {
+        display: none;
       }
-      .page{
-        box-shadow:none;
-        margin:0;
-        width:210mm;
-        min-height:297mm;
-        border-radius:0;
-        page-break-after:always;
+      .page {
+        box-shadow: none;
+        margin: 0;
+        width: 210mm;
+        min-height: 297mm;
+        border-radius: 0;
+        page-break-after: always;
       }
     }
 
-    @media (max-width:900px){
-      body{ padding:20px 10px; }
-      .panel{ padding:14px 14px 12px; }
-      .fields-row{ gap:10px; }
+    @media (max-width: 768px) {
+      .settings-table th,
+      .settings-table td {
+        display: block;
+        width: 100%;
+        border-bottom: none;
+      }
+      .settings-table tr {
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .settings-table th {
+        border-radius: 6px 6px 0 0;
+      }
+      .settings-table td {
+        padding-top: 4px;
+        padding-bottom: 10px;
+      }
     }
   </style>
 </head>
@@ -252,64 +245,47 @@
 <div class="app">
   <div class="header">
     <h1>Bulk UPC Label Generator</h1>
-    <p>Generate A4 sheets with 3 labels per page. Each line has its own UPC and quantity.</p>
+    <p>Use the table below to set label text and paste UPC with quantity. Preview shows 3 labels per A4 page.</p>
   </div>
 
-  <!-- Step 1: Static text -->
-  <div class="panel">
-    <div class="panel-header">
-      <div>
-        <div class="panel-step">Step 1</div>
-        <div class="panel-title">Label text (same on every label)</div>
-      </div>
-      <span class="tag">A4 • 3 labels per page</span>
-    </div>
+  <div class="table-card">
+    <h2 class="table-title">Label configuration</h2>
 
-    <div class="fields-row">
-      <div class="field">
-        <label for="line1">Line 1 (Name)</label>
-        <input id="line1" type="text" value="Nilu’s collection,">
-      </div>
-      <div class="field">
-        <label for="line2">Line 2 (Company)</label>
-        <input id="line2" type="text" value="BLINK COMMERCE PRIVATE LIMITED">
-      </div>
-      <div class="field">
-        <label for="line3">Line 3 (Location)</label>
-        <input id="line3" type="text" value="Hyderabad H3 - Feeder Warehouse">
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 2: UPC + quantity -->
-  <div class="panel">
-    <div class="panel-header">
-      <div>
-        <div class="panel-step">Step 2</div>
-        <div class="panel-title">UPC and quantity list</div>
-      </div>
-    </div>
-
-    <div class="field">
-      <label for="upcList">Enter one record per line in this format: UPC,Quantity</label>
-      <textarea id="upcList"
-        placeholder="20110519,31&#10;20110520,12&#10;20110521,8"></textarea>
-      <div class="hint">
-        Example line: <strong>20110519,31</strong> → UPC 20110519 with Quantity 31 on that label.
-      </div>
-    </div>
+    <table class="settings-table">
+      <tr>
+        <th>Line 1 (Name)</th>
+        <td><input id="line1" type="text" value="Nilu’s collection,"></td>
+      </tr>
+      <tr>
+        <th>Line 2 (Company)</th>
+        <td><input id="line2" type="text" value="BLINK COMMERCE PRIVATE LIMITED"></td>
+      </tr>
+      <tr>
+        <th>Line 3 (Location)</th>
+        <td><input id="line3" type="text" value="Hyderabad H3 - Feeder Warehouse"></td>
+      </tr>
+      <tr>
+        <th>UPC and Quantity</th>
+        <td>
+          <textarea id="upcList"
+            placeholder="20110519,31&#10;20110520,12&#10;20110521,8"></textarea>
+          <div class="hint">
+            Each line: <strong>UPC,Quantity</strong>. Example: <strong>20110519,31</strong>.
+          </div>
+        </td>
+      </tr>
+    </table>
 
     <div class="actions">
       <button id="generate" class="btn btn-primary">Generate labels</button>
-      <button type="button" class="btn btn-secondary" onclick="window.print()">Print on A4</button>
-      <span class="hint">After generating, use Print and keep scale at 100% for correct sizing.</span>
+      <button type="button" class="btn btn-secondary" onclick="window.print()">Print A4 (3 per page)</button>
     </div>
   </div>
 
   <div id="pagesContainer"></div>
 </div>
 
-<!-- JsBarcode library (JS CDN) -->
+<!-- JsBarcode library -->
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script> <!-- [web:60] -->
 
 <script>
