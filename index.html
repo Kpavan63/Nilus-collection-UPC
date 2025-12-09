@@ -2,259 +2,465 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bulk UPC Label Generator</title>
+  <title>Bulk UPC Label Generator - Glass UI</title>
 
   <style>
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.75);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+    }
+
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f3f4f6;
-      color: #111827;
-      padding: 24px 12px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: var(--text-main);
+      padding: 40px 20px;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
     }
 
-    .app {
+    .app-container {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
-    .header {
-      margin-bottom: 16px;
+    /* Glass Card Style */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      padding: 30px;
     }
+
     .header h1 {
-      margin: 0 0 4px;
-      font-size: 22px;
-      font-weight: 700;
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(to right, #4f46e5, #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
+
     .header p {
       margin: 0;
-      font-size: 13px;
-      color: #6b7280;
+      color: var(--text-muted);
+      font-size: 14px;
     }
 
-    .table-card {
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 10px 24px rgba(15,23,42,0.12);
-      padding: 14px 16px 12px;
-      margin-bottom: 14px;
-      border: 1px solid #e5e7eb;
+    /* Grid Layout for Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 20px;
     }
 
-    .table-title {
-      font-size: 15px;
+    .form-section h3 {
+      font-size: 16px;
       font-weight: 600;
-      margin: 0 0 8px;
+      margin: 0 0 16px;
+      color: #374151;
+      border-bottom: 2px solid rgba(79, 70, 229, 0.1);
+      padding-bottom: 8px;
+      display: inline-block;
     }
 
-    .settings-table {
-      width: 100%;
-      border-collapse: collapse;
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
       margin-bottom: 6px;
     }
 
-    .settings-table th,
-    .settings-table td {
-      padding: 8px 6px;
-      font-size: 13px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    .settings-table th {
-      width: 180px;
-      color: #4b5563;
-      font-weight: 600;
-      border-bottom: 1px solid #e5e7eb;
-      background: #f9fafb;
-    }
-
-    .settings-table td {
-      border-bottom: 1px solid #f3f4f6;
-    }
-
-    .settings-table tr:last-child th,
-    .settings-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    input[type="text"],
-    textarea {
+    .input-field {
       width: 100%;
-      padding: 7px 9px;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(209, 213, 219, 0.6);
+      background: rgba(255, 255, 255, 0.6);
       font-size: 14px;
-      font-family: inherit;
-      background: #f9fafb;
       outline: none;
+      transition: all 0.2s;
     }
 
-    textarea {
-      min-height: 150px;
+    .input-field:focus {
+      background: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
-    .actions {
-      margin-top: 10px;
+    textarea.input-field {
+      min-height: 180px;
+      resize: vertical;
+      font-family: monospace;
+    }
+
+    .helper-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Action Buttons */
+    .action-bar {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
     }
 
     .btn {
-      border-radius: 999px;
-      border: none;
-      padding: 8px 18px;
-      font-size: 14px;
+      padding: 12px 28px;
+      border-radius: 12px;
       font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
+      border: none;
+      transition: transform 0.1s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
+
+    .btn:active { transform: scale(0.98); }
 
     .btn-primary {
-      background: #2563eb;
-      color: #ffffff;
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      color: white;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     }
 
-    .btn-download {
-      background: #10b981;
-      color: #ffffff;
+    .btn-primary:hover {
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
     }
 
-    .btn-download-word {
-      background: #3b82f6;
-      color: #ffffff;
-    }
-
-    #previewArea {
+    /* Preview Section */
+    #previewSection {
       display: none;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .preview-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.5);
+      padding: 12px 20px;
+      border-radius: 12px;
+    }
+
+    .preview-info {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .tool-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: white;
+      color: #374151;
+      margin-left: 8px;
+      transition: all 0.2s;
+    }
+
+    .tool-btn:hover { background: #f9fafb; border-color: #d1d5db; }
+    
+    .tool-btn.pdf-btn { color: #dc2626; border-color: rgba(220, 38, 38, 0.2); }
+    .tool-btn.pdf-btn:hover { background: #fef2f2; }
+    
+    .tool-btn.word-btn { color: #2563eb; border-color: rgba(37, 99, 235, 0.2); }
+    .tool-btn.word-btn:hover { background: #eff6ff; }
+
+    /* A4 Page Preview */
+    .page-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 40px;
     }
 
     .page {
       width: 210mm;
       min-height: 297mm;
-      background: #ffffff;
-      margin: 10px auto;
+      background: white;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
       padding: 15mm;
+      position: relative;
     }
 
     .label {
-      border-bottom: 1px dashed #ccc;
-      margin-bottom: 10mm;
-      padding-bottom: 10mm;
+      height: calc((297mm - 30mm) / 3);
+      border-bottom: 1px dashed #e5e7eb;
+      padding-bottom: 5mm;
+      margin-bottom: 5mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    
+    .label:last-child { border-bottom: none; margin-bottom: 0; }
+
+    /* Label Typography */
+    .label h1 { font-size: 20px; font-weight: 800; margin: 0 0 2px; color: #000; }
+    .label h2 { font-size: 18px; font-weight: 700; margin: 0 0 8px; color: #000; }
+    .label h3 { font-size: 16px; font-weight: 500; margin: 0 0 10px; color: #333; }
+    .label p { font-size: 14px; margin: 4px 0 0; color: #000; }
+
+    .barcode-svg { 
+      display: block;
+      margin: 10px 0;
+      max-width: 100%;
+    }
+
+    /* Print Styles */
+    @media print {
+      body { background: none; padding: 0; }
+      .app-container > *:not(#previewSection) { display: none; }
+      .preview-toolbar { display: none; }
+      .page-container { gap: 0; }
+      .glass-card { box-shadow: none; border: none; background: none; padding: 0; }
+      .page { box-shadow: none; margin: 0; page-break-after: always; width: 100%; height: 100%; }
+    }
+
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-<div class="app">
-  <div class="header">
-    <h1>Bulk UPC Label Generator</h1>
+<div class="app-container">
+  <!-- Config Card -->
+  <div class="glass-card header">
+    <h1>Bulk UPC Generator</h1>
+    <p>Generate professional warehouse labels. 3 labels per A4 page.</p>
   </div>
 
-  <div class="table-card">
-    <table class="settings-table">
-      <tr>
-        <th>Line 1</th>
-        <td><input id="line1" value="Nilu's Collection"></td>
-      </tr>
-      <tr>
-        <th>Line 2</th>
-        <td><input id="line2" value="BLINK COMMERCE PRIVATE LIMITED"></td>
-      </tr>
-      <tr>
-        <th>Line 3</th>
-        <td><input id="line3" value="Hyderabad Warehouse"></td>
-      </tr>
-      <tr>
-        <th>UPC List</th>
-        <td>
-          <textarea id="upcList">20110519,31
-20110520,12
-20110521,8</textarea>
-        </td>
-      </tr>
-    </table>
+  <div class="glass-card">
+    <div class="form-grid">
+      <!-- Left: Fixed Details -->
+      <div class="form-section">
+        <h3>1. Static Details</h3>
+        
+        <div class="input-group">
+          <label>Line 1 (Name)</label>
+          <input type="text" id="line1" class="input-field" value="Nilu’s collection,">
+        </div>
 
-    <div class="actions">
-      <button id="generate" class="btn btn-primary">Generate Labels</button>
+        <div class="input-group">
+          <label>Line 2 (Company)</label>
+          <input type="text" id="line2" class="input-field" value="BLINK COMMERCE PRIVATE LIMITED">
+        </div>
+
+        <div class="input-group">
+          <label>Line 3 (Warehouse)</label>
+          <input type="text" id="line3" class="input-field" value="Hyderabad H3 - Feeder Warehouse">
+        </div>
+      </div>
+
+      <!-- Right: Dynamic Data -->
+      <div class="form-section">
+        <h3>2. UPC Data</h3>
+        
+        <div class="input-group">
+          <label>Paste Data (Format: UPC,Quantity)</label>
+          <textarea id="upcList" class="input-field" placeholder="20110519,31&#10;20110520,15&#10;20110521,50"></textarea>
+          <div class="helper-text">Enter one item per line. Example: <b>20110519,31</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button id="generateBtn" class="btn btn-primary">
+        <span>✨ Generate Labels</span>
+      </button>
     </div>
   </div>
 
-  <div id="previewArea">
-    <button id="downloadPdf" class="btn btn-download">Download PDF</button>
-    <button id="downloadWord" class="btn btn-download-word">Download Word</button>
-    <div id="pagesContainer"></div>
+  <!-- Preview Section -->
+  <div id="previewSection">
+    <div class="preview-toolbar">
+      <div class="preview-info" id="previewCount">Ready to print</div>
+      <div class="tools">
+        <button class="tool-btn pdf-btn" onclick="downloadPDF()">Download PDF</button>
+        <button class="tool-btn word-btn" onclick="downloadWord()">Download Word</button>
+        <button class="tool-btn" onclick="window.print()">🖨️ Print</button>
+      </div>
+    </div>
+
+    <div id="pagesWrapper" class="page-container">
+      <!-- Pages will be injected here -->
+    </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
+<script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 <script>
-  let generatedLabels = {};
+  // DOM Elements
+  const generateBtn = document.getElementById('generateBtn');
+  const previewSection = document.getElementById('previewSection');
+  const pagesWrapper = document.getElementById('pagesWrapper');
+  const previewCount = document.getElementById('previewCount');
 
-  // ✅ FIXED FUNCTION
-  function parseLines(raw) {
-    return raw
-      .split(/\r?\n/)  // ✅ FIXED HERE
-      .map(line => line.trim())
-      .filter(line => line.length > 0)
-      .map(line => {
-        const parts = line.split(',');
-        return {
-          upc: parts[0]?.trim(),
-          qty: parts[1]?.trim() || "1"
-        };
-      });
-  }
+  // Generate Function
+  generateBtn.addEventListener('click', () => {
+    const line1 = document.getElementById('line1').value;
+    const line2 = document.getElementById('line2').value;
+    const line3 = document.getElementById('line3').value;
+    const rawData = document.getElementById('upcList').value.trim();
 
-  function generateLabels() {
-    const line1 = line1Input.value.trim();
-    const line2 = line2Input.value.trim();
-    const line3 = line3Input.value.trim();
-    const rawList = upcList.value;
-
-    const items = parseLines(rawList);
-    const container = document.getElementById('pagesContainer');
-    container.innerHTML = "";
-
-    if (!items.length) {
-      alert("Enter UPC data");
+    if (!rawData) {
+      alert("Please enter at least one UPC line.");
       return;
     }
 
-    let page = document.createElement("div");
-    page.className = "page";
-    container.appendChild(page);
+    const lines = rawData.split('\n').filter(l => l.trim() !== '');
+    const items = lines.map(line => {
+      const [upc, qty] = line.split(',');
+      return { 
+        upc: upc ? upc.trim() : '', 
+        qty: qty ? qty.trim() : '1' 
+      };
+    }).filter(i => i.upc);
 
-    items.forEach(({ upc, qty }) => {
-      const label = document.createElement("div");
-      label.className = "label";
+    // Clear previous
+    pagesWrapper.innerHTML = '';
+    
+    // Create Pages
+    let currentPage = null;
+    let itemsOnPage = 0;
 
-      label.innerHTML = `
-        <h3>${line1}</h3>
-        <p>${line2}</p>
-        <p>${line3}</p>
-        <svg></svg>
-        <p><b>UPC:</b> ${upc}</p>
-        <p><b>Qty:</b> ${qty}</p>
+    items.forEach((item, index) => {
+      if (index % 3 === 0) {
+        currentPage = document.createElement('div');
+        currentPage.className = 'page';
+        pagesWrapper.appendChild(currentPage);
+        itemsOnPage = 0;
+      }
+
+      const labelHtml = `
+        <div class="label">
+          <h1>${line1}</h1>
+          <h2>${line2}</h2>
+          <h3>${line3}</h3>
+          <svg class="barcode-svg" id="bc-${index}"></svg>
+          <p><strong>UPC - ${item.upc}</strong></p>
+          <p><strong>Quantity - ${item.qty}</strong></p>
+        </div>
       `;
-
-      page.appendChild(label);
-
-      JsBarcode(label.querySelector("svg"), upc, {
+      
+      currentPage.insertAdjacentHTML('beforeend', labelHtml);
+      
+      // Render Barcode
+      JsBarcode(`#bc-${index}`, item.upc, {
         format: "CODE128",
-        displayValue: true
+        width: 2,
+        height: 60,
+        displayValue: true,
+        fontSize: 14,
+        margin: 0
       });
+
+      itemsOnPage++;
     });
 
-    generatedLabels = { line1, line2, line3, items };
-    document.getElementById("previewArea").style.display = "block";
+    // Show Preview
+    previewSection.style.display = 'block';
+    previewCount.innerText = `Generated ${items.length} labels on ${Math.ceil(items.length/3)} page(s)`;
+    
+    // Smooth Scroll
+    previewSection.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // Download PDF
+  function downloadPDF() {
+    const element = document.getElementById('pagesWrapper');
+    const opt = {
+      margin: 0,
+      filename: 'labels.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
   }
 
-  document.getElementById("generate").onclick = generateLabels;
+  // Download Word
+  function downloadWord() {
+    const line1 = document.getElementById('line1').value;
+    const line2 = document.getElementById('line2').value;
+    const line3 = document.getElementById('line3').value;
+    const rawData = document.getElementById('upcList').value.trim();
+    
+    if (!rawData) return;
+
+    const items = rawData.split('\n')
+      .filter(l => l.trim() !== '')
+      .map(line => {
+        const [upc, qty] = line.split(',');
+        return { upc: upc?.trim(), qty: qty?.trim() || '1' };
+      });
+
+    const doc = new docx.Document({
+      sections: items.map((item, index) => {
+        // Only break page after every 3rd item, but Word is tricky with absolute positioning.
+        // We will just list them sequentially. 
+        // Note: Perfect visual replication in Word via JS is limited.
+        return {
+          children: [
+            new docx.Paragraph({ text: line1, heading: docx.HeadingLevel.HEADING_2 }),
+            new docx.Paragraph({ text: line2, bold: true }),
+            new docx.Paragraph({ text: line3 }),
+            new docx.Paragraph({ text: `UPC: ${item.upc}` }),
+            new docx.Paragraph({ text: `Quantity: ${item.qty}` }),
+            new docx.Paragraph({ text: "------------------------------------------------" }), // Separator
+          ]
+        };
+      })
+    });
+
+    docx.Packer.toBlob(doc).then(blob => {
+      saveAs(blob, "labels.docx");
+    });
+  }
 </script>
 
 </body>
