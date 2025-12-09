@@ -103,9 +103,9 @@
       display: flex;
       flex-direction: column;
       
-      padding: 10mm; /* Safe print margin inside the page */
+      padding: 10mm;
       page-break-after: always;
-      overflow: hidden; /* Cut off anything that overflows */
+      overflow: hidden;
     }
 
     .label-container {
@@ -118,14 +118,11 @@
       align-items: center;
       text-align: center;
       
-      border: 2px solid #000; /* The "Table" border */
-      
-      /* Use margin-top: -2px to merge borders so they look like a single table */
+      border: 2px solid #000;
       margin-top: -2px; 
       padding: 5px;
     }
 
-    /* Fix top border for the first item */
     .label-container:first-child {
       margin-top: 0;
     }
@@ -147,14 +144,14 @@
     
     .txt-ware { 
       font-size: 15pt; 
-      font-weight: 900; /* BOLD as requested */
+      font-weight: 900;
       margin: 0 0 10px 0;
       color: #000;
     }
 
     .barcode-svg {
       width: 80%;
-      height: 65px; /* Fixed height to prevent overflow */
+      height: 65px;
       margin: 5px 0;
       display: block;
     }
@@ -186,269 +183,4 @@
       }
 
       .page {
-        transform: scale(0.5);
-        transform-origin: top center;
-        margin-bottom: -150mm;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .page {
-        transform: scale(0.35);
-        margin-bottom: -190mm;
-      }
-    }
-
-    /* --- CRITICAL PRINT CSS --- */
-    @page {
-      size: A4 portrait;
-      margin: 0;
-    }
-
-    @media print {
-      body {
-        margin: 0;
-        padding: 0;
-        background: white;
-      }
-      
-      /* HIDE INPUT FORM WHEN PRINTING */
-      .input-panel { 
-        display: none !important; 
-      }
-      
-      #previewArea {
-        margin: 0;
-        padding: 0;
-      }
-
-      .page {
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-        width: 210mm;
-        height: 297mm;
-        page-break-after: always;
-        
-        /* REMOVE PADDING FOR PRINT - FILL ENTIRE PAGE */
-        padding: 0 !important;
-        
-        /* USE SPACE-BETWEEN TO DISTRIBUTE LABELS: TOP, MIDDLE, BOTTOM */
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-      
-      /* Avoid extra blank page at the end */
-      .page:last-child {
-        page-break-after: auto;
-      }
-
-      .label-container {
-        /* Each label takes EXACTLY 1/3 of A4 height (99mm) */
-        flex: 0 0 99mm; /* Fixed height, no grow, no shrink */
-        width: 210mm;
-        height: 99mm;
-        
-        border: 3px solid #000;
-        padding: 8mm;
-        margin: 0;
-        
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        
-        page-break-inside: avoid;
-      }
-
-      /* Remove border merging for print - each label separate */
-      .label-container:first-child {
-        border: 3px solid #000;
-      }
-
-      /* TEXT SIZES FOR PRINT */
-      .txt-name { 
-        font-size: 22pt; 
-        font-weight: 900; 
-        margin: 0 0 5px 0;
-      }
-      
-      .txt-comp { 
-        font-size: 16pt; 
-        font-weight: 700; 
-        margin: 0 0 5px 0;
-      }
-      
-      .txt-ware { 
-        font-size: 15pt; 
-        font-weight: 900;
-        margin: 0 0 10px 0;
-      }
-
-      .barcode-svg {
-        width: 75%;
-        height: 70px;
-        margin: 8px 0;
-      }
-
-      .txt-meta {
-        font-size: 18pt; 
-        font-weight: 700;
-        margin: 3px 0;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- INPUT FORM -->
-  <div class="input-panel">
-    <h1>Bulk UPC Label Generator</h1>
-    <p><b>Note:</b> In print settings, ensure Margins are set to "None" for perfect A4 output.</p>
-
-    <div class="form-group">
-      <label>Line 1 (Name)</label>
-      <input type="text" id="line1" value="Nilu's collection,">
-    </div>
-
-    <div class="form-group">
-      <label>Line 2 (Company)</label>
-      <input type="text" id="line2" value="BLINK COMMERCE PRIVATE LIMITED">
-    </div>
-
-    <div class="form-group">
-      <label>Line 3 (Warehouse - BOLD)</label>
-      <input type="text" id="line3" value="Hyderabad H3 - Feeder Warehouse">
-    </div>
-
-    <div class="form-group">
-      <label>UPC Data (UPC,Quantity)</label>
-      <textarea id="upcData" placeholder="20110519,31
-20110520,15
-20110521,6
-20110522,10
-20110523,25
-
-Add more lines..."></textarea>
-    </div>
-
-    <button onclick="generateLabels()">Generate Preview</button>
-    <button class="btn-print" onclick="window.print()">Print Labels</button>
-  </div>
-
-  <!-- PREVIEW / PRINT AREA -->
-  <div id="previewArea"></div>
-
-  <!-- JS BARCODE LIBRARY -->
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
-  <script>
-    function generateLabels() {
-      const line1 = document.getElementById('line1').value;
-      const line2 = document.getElementById('line2').value;
-      const line3 = document.getElementById('line3').value;
-      const rawData = document.getElementById('upcData').value.trim();
-
-      if (!rawData) { 
-        alert("Please enter UPC data."); 
-        return; 
-      }
-
-      const items = rawData.split('\n')
-        .filter(l => l.trim())
-        .map(l => {
-          const [u, q] = l.split(',');
-          return { upc: u?.trim(), qty: q?.trim() || '1' };
-        })
-        .filter(i => i.upc);
-
-      if (items.length === 0) {
-        alert("No valid UPC data found. Please use format: UPC,Quantity");
-        return;
-      }
-
-      const previewArea = document.getElementById('previewArea');
-      previewArea.innerHTML = ''; // Clear previous
-
-      // Loop through items in chunks of 3
-      for (let i = 0; i < items.length; i += 3) {
-        // Create Page
-        const page = document.createElement('div');
-        page.className = 'page';
-
-        // Get chunk of 3 items (or less for last page)
-        const chunk = items.slice(i, i + 3);
-
-        // Always create exactly 3 label slots per page
-        for (let j = 0; j < 3; j++) {
-          const item = chunk[j];
-          const labelDiv = document.createElement('div');
-          labelDiv.className = 'label-container';
-
-          if (item) {
-            const bcId = `bc-${i}-${j}`;
-            labelDiv.innerHTML = `
-              <div class="txt-name">${escapeHtml(line1)}</div>
-              <div class="txt-comp">${escapeHtml(line2)}</div>
-              <div class="txt-ware">${escapeHtml(line3)}</div>
-              <svg id="${bcId}" class="barcode-svg"></svg>
-              <div class="txt-meta">UPC - ${escapeHtml(item.upc)}</div>
-              <div class="txt-meta">Quantity - ${escapeHtml(item.qty)}</div>
-            `;
-            
-            page.appendChild(labelDiv);
-
-            // Generate Barcode
-            setTimeout(() => {
-              try {
-                JsBarcode(`#${bcId}`, item.upc, {
-                  format: "CODE128",
-                  width: 3,
-                  height: 60,
-                  displayValue: true,
-                  fontSize: 18,
-                  fontOptions: "bold",
-                  margin: 0
-                });
-              } catch (e) {
-                console.error('Barcode generation error:', e);
-                document.getElementById(bcId).innerHTML = '<text style="color: red;">Invalid UPC</text>';
-              }
-            }, 0);
-          } else {
-            // Empty placeholder for layout consistency if last page has < 3 items
-            labelDiv.style.border = "2px solid #ddd"; // Light border for empty slot
-            labelDiv.innerHTML = '<div style="color: #ccc; font-size: 14pt;">Empty Slot</div>';
-            page.appendChild(labelDiv);
-          }
-        }
-        
-        previewArea.appendChild(page);
-      }
-
-      // Scroll to preview
-      setTimeout(() => {
-        previewArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-
-    // Helper function to prevent XSS attacks
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    // Auto-generate on page load if data exists
-    window.addEventListener('load', function() {
-      const upcData = document.getElementById('upcData').value.trim();
-      if (upcData) {
-        generateLabels();
-      }
-    });
-  </script>
-
-</body>
-</html>
+        transform
