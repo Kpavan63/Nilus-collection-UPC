@@ -89,6 +89,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 20px;
     }
 
     /* --- A4 PAGE STYLING FOR SCREEN --- */
@@ -96,7 +97,6 @@
       width: 210mm;
       height: 297mm;
       background: white;
-      margin-bottom: 20px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       
       /* FLEX LAYOUT FOR EXACT 3 LABELS */
@@ -207,8 +207,6 @@
         margin: 0;
         padding: 0;
         background: white;
-        width: 210mm;
-        height: 297mm;
       }
       
       /* HIDE INPUT FORM */
@@ -219,6 +217,7 @@
       #previewArea {
         margin: 0;
         padding: 0;
+        gap: 0;
       }
 
       .page {
@@ -340,6 +339,10 @@
 20110521,6
 20110522,10
 20110523,25
+20110524,12
+20110525,8
+20110526,20
+20110527,15
 
 Add more lines..."></textarea>
     </div>
@@ -382,7 +385,7 @@ Add more lines..."></textarea>
       const previewArea = document.getElementById('previewArea');
       previewArea.innerHTML = '';
 
-      // Process items in chunks of 3
+      // Process items in chunks of 3 (one A4 page = 3 labels)
       for (let i = 0; i < items.length; i += 3) {
         const page = document.createElement('div');
         page.className = 'page';
@@ -423,11 +426,11 @@ Add more lines..."></textarea>
                 console.error('Barcode error:', e);
                 document.getElementById(bcId).innerHTML = '<text style="color:red;font-weight:bold;">Invalid UPC</text>';
               }
-            }, 0);
+            }, 10);
           } else {
-            // Empty slot
+            // Empty slot for incomplete last page
             labelDiv.style.border = "2px solid #ddd";
-            labelDiv.innerHTML = '<div style="color:#ccc;font-size:14pt;">Empty</div>';
+            labelDiv.innerHTML = '<div style="color:#ccc;font-size:14pt;">Empty Slot</div>';
             page.appendChild(labelDiv);
           }
         }
@@ -437,7 +440,7 @@ Add more lines..."></textarea>
 
       setTimeout(() => {
         previewArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
+      }, 150);
     }
 
     function escapeHtml(text) {
