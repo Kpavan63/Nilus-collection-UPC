@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="https://www.google.com/s2/favicons?sz=64&domain=blinkit.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <!-- Dinosaur Favicon -->
+  <title>Bulk UPC Label AI</title>
+  
+  <!-- Toastify.js CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  
+  <style>
+    /* --- MODERN RESET & BASE STYLES --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary-blue: #2563eb;
+      --dark-blue: #1d4ed8;
+      --success-green: #059669;
+      --dark-green: #047857;
+      --error-red: #dc2626;
+      --text-dark: #1f2937;
+      --text-medium: #4b5563;
+      --border-light: #e5e7eb;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9fafb;
+      color: var(--text-dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    /* --- HEADER --- */
+    .app-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .app-header h1 {
+      color: var(--primary-blue);
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .app-header p {
+      color: var(--text-medium);
+      font-size: clamp(0.875rem, 2vw, 1rem);
+      font-weight: 500;
+    }
+
+    /* --- CONTAINER & CARD LAYOUT --- */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .input-panel {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-light);
+    }
+
+    /* --- FORM STYLES --- */
+    .form-grid {
+      display: grid;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.875rem;
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 200px;
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+    }
+
+    /* --- BUTTON STYLES --- */
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      min-width: 150px;
+      padding: 0.875rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary {
+      background: var(--primary-blue);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--dark-blue);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+      background: var(--success-green);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: var(--dark-green);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* --- PREVIEW AREA --- */
+    #previewArea {
+      margin-top: 2rem;
+    }
+
+    /* --- A4 PAGE STYLING --- */
+    .page {
+      width: 210mm;
+      height: 297mm;
+      background: white;
+      margin: 0 auto 2rem auto;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      padding: 10mm;
+      page-break-after: always;
+      overflow: hidden;
+    }
+
+    .label-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border: 2px solid #000;
+      margin-top: -2px;
+      padding: 1rem;
+    }
+
+    .label-container:first-child {
+      margin-top: 0;
+    }
+
+    /* --- TEXT STYLING --- */
+    .txt-name {
+      font-size: 22pt;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin: 0 0 5px 0;
+      line-height: 1.1;
+      color: var(--text-dark);
+      letter-spacing: 0.5px;
+    }
+
+    .txt-comp {
+      font-size: 16pt;
+      font-weight: 800;
+      margin: 0 0 5px 0;
+      color: var(--text-dark);
+    }
+
+    .txt-ware {
+      font-size: 15pt;
+      font-weight: 900;
+      margin: 0 0 10px 0;
+      color: #000;
+      letter-spacing: 0.3px;
+    }
+
+    .barcode-svg {
+      width: 80%;
+      height: 65px;
+      margin: 5px 0;
+      display: block;
+    }
+
+    .txt-meta {
+      font-size: 18pt;
+      font-weight: 700;
+      margin: 2px 0;
+      color: var(--text-dark);
+    }
+
+    /* --- RESPONSIVE BREAKPOINTS --- */
+    @media (max-width: 768px) {
+      body {
+        padding: 0.5rem;
+      }
+
+      .input-panel {
+        padding: 1.5rem;
+      }
+
+      .form-grid {
+        gap: 1rem;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+        min-width: auto;
+      }
+
+      .app-header h1 {
+        font-size: 1.75rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .input-panel {
+        padding: 1rem;
+        border-radius: 10px;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+      }
+
+      button {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+      }
+    }
+
+    /* --- CRITICAL PRINT CSS --- */
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: white;
+      }
+
+      .app-header,
+      .input-panel {
+        display: none !important;
+      }
+
+      .page {
+        margin: 0;
+        box-shadow: none;
+        width: 210mm;
+        height: 297mm;
+        page-break-after: always;
+      }
+
+      .page:last-child {
+        page-break-after: auto;
+      }
+
+      #previewArea {
+        margin-top: 0;
+      }
+    }
+
+    /* --- UTILITY CLASSES --- */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    .info-box {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary-blue);
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .info-box strong {
+      color: var(--primary-blue);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <h1>📦 Bulk UPC Label Generator</h1>
+    <p>Generate professional labels for your e-commerce inventory</p>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="container">
+
+    <!-- INPUT PANEL -->
+    <div class="input-panel">
+      <div class="info-box">
+        <strong>Printing Tip:</strong> In print settings, set Margins to "None" for best results.
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="line1">Line 1 (Name)</label>
+          <input type="text" id="line1" value="Nilu's collection,">
+        </div>
+
+        <div class="form-group">
+          <label for="line2">Line 2 (Company)</label>
+          <input type="text" id="line2" value="BLINK COMMERCE PRIVATE LIMITED">
+        </div>
+
+        <div class="form-group">
+          <label for="line3">Line 3 (Warehouse - BOLD)</label>
+          <input type="text" id="line3" value="Hyderabad H3 - Feeder Warehouse">
+        </div>
+
+        <div class="form-group">
+          <label for="upcData">UPC Data (UPC,Quantity)</label>
+          <textarea 
+            id="upcData" 
+            placeholder="Enter UPC data in format: UPC,Quantity&#10;&#10;Example:&#10;20110519,31&#10;20110520,15&#10;20110521,6&#10;20110522,10"
+            rows="8"></textarea>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary" onclick="generateLabels()">🎯 Generate Preview</button>
+        <button class="btn-success" onclick="window.print()">🖨️ Print Labels</button>
+      </div>
+    </div>
+
+    <!-- PREVIEW / PRINT AREA -->
+    <div id="previewArea"></div>
+
+  </div>
+
+  <!-- JS LIBRARIES -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <script>
+    function generateLabels() {
+      const line1 = document.getElementById('line1').value;
+      const line2 = document.getElementById('line2').value;
+      const line3 = document.getElementById('line3').value;
+      const rawData = document.getElementById('upcData').value.trim();
+
+      if (!rawData) {
+        // ❌ ERROR TOAST
+        Toastify({
+          text: "⚠️ Please enter UPC data!",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "center",
+          backgroundColor: "#dc2626",
+          stopOnFocus: true,
+          className: "toast-error"
+        }).showToast();
+        return;
+      }
+
+      const items = rawData.split('\n')
+        .filter(l => l.trim())
+        .map(l => {
+          const [u, q] = l.split(',');
+          return { upc: u?.trim(), qty: q?.trim() || '1' };
+        })
+        .filter(i => i.upc);
+
+      const previewArea = document.getElementById('previewArea');
+      previewArea.innerHTML = ''; // Clear previous
+
+      // Loop through items in chunks of 3
+      for (let i = 0; i < items.length; i += 3) {
+        // Create Page
+        const page = document.createElement('div');
+        page.className = 'page';
+
+        // Get chunk of 3 items
+        const chunk = items.slice(i, i + 3);
+
+        // Fill page with 3 slots
+        for (let j = 0; j < 3; j++) {
+          const item = chunk[j];
+          const labelDiv = document.createElement('div');
+          labelDiv.className = 'label-container';
+
+          if (item) {
+            const bcId = `bc-${i}-${j}`;
+            labelDiv.innerHTML = `
+              <div class="txt-name">${line1}</div>
+              <div class="txt-comp">${line2}</div>
+              <div class="txt-ware">${line3}</div>
+              <svg id="${bcId}" class="barcode-svg"></svg>
+              <div class="txt-meta">UPC - ${item.upc}</div>
+              <div class="txt-meta">Quantity - ${item.qty}</div>
+            `;
+            
+            page.appendChild(labelDiv);
+
+            // Generate Barcode
+            setTimeout(() => {
+              JsBarcode(`#${bcId}`, item.upc, {
+                format: "CODE128",
+                width: 3,
+                height: 60,
+                displayValue: true,
+                fontSize: 18,
+                margin: 0
+              });
+            }, 0);
+          } else {
+            // Empty placeholder for layout consistency if last page has < 3 items
+            labelDiv.style.border = "none"; // Hide border for empty slot
+            page.appendChild(labelDiv);
+          }
+        }
+        
+        previewArea.appendChild(page);
+      }
+
+      // ✅ SUCCESS TOAST
+      Toastify({
+        text: `✅ ${items.length} label(s) generated successfully!`,
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "center",
+        backgroundColor: "#059669",
+        stopOnFocus: true,
+        className: "toast-success"
+      }).showToast();
+    }
+
+    // Auto-generate on load
+    window.addEventListener('DOMContentLoaded', () => {
+      generateLabels();
+    });
+
+    // Auto-resize textarea as user types
+    document.getElementById('upcData').addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.max(200, this.scrollHeight) + 'px';
+    });
+  </script>
+
+</body>
+</html>
